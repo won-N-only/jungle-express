@@ -75,3 +75,6 @@
         
               
     - swagger 적용
+   ERD
+    - ![image](https://github.com/won-N-only/jungle-express/assets/162883112/3855eed8-aaec-40f0-9b96-0c860b664391)
+
