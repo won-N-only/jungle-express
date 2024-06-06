@@ -11,7 +11,7 @@ const indexRouter = require("./routes/index.js");
 app.use("/api", [indexRouter]); // 일단 index로 보냄
 
 app.get("/", (req, res) => {
-  res.send("반갑습 니다 ㅎㅎ");
+  res.send("🍺🍕 🍻반가워요 🍻🍕🍺"); // 여기에 async 안걸고 여러줄 적으면 터져
 });
 
 app.listen(port, () => {
