@@ -46,4 +46,24 @@ router.post("/:postId", async (req, res) => {
   }
 });
 
+/** 댓글 수정 */
+router.patch("/:commentId", async (req, res) => {
+  try {
+    const {commentId} = req.params;
+    const {content} = req.body;
+
+    if (!content) return res.json({result: "댓글 내용 입력좀"}).status(400);
+
+    console.log("수정 시도");
+    const comment = await commentSchema.findOne({_id: commentId});
+    comment.content = content;
+    comment.save();
+    console.log("수정 성공");
+
+    res.status(200).json({comment: comment, result: "success"});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({errorMessage: "에러가 나타났다"});
+  }
+});
 module.exports = router;
