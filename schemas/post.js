@@ -4,15 +4,9 @@ const mongoose = require("mongoose");
 const postSchema = new mongoose.Schema({
   title: {type: String, required: true},
   writer: {type: String, required: true},
-  date: {type: String, required: true},
+  date: {type: Date, required: true},
   password: {type: String, required: true},
   content: {type: String, required: true},
 });
 
-/** 게시글 id는 obj_id를 들고와서 가상으로 만들어둠 */
-postSchema.virtual("postId").get(function () {
-  return this._id.toHexString();
-});
-
-postSchema.set("toJSON", {virtuals: true});
 module.exports = mongoose.model("Post", postSchema);
