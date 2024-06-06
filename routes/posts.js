@@ -87,18 +87,21 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 });
 
 /** 게시글 삭제 */
-router.delete("/:postId", async (req, res) => {
+router.delete("/:postId", authMiddleware, async (req, res) => {
+  const {postId} = req.params;
+  const post = await postSchema.findById(postId);
+
+  if (!post) {
+    const err = new Error();
+    console.error("게시글이없어요");
+    throw err;
+  }
+
+  const writtenUser = res.locals.user;
+  if (post.nickname !== writtenUser.nickname)
+    return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
+
   try {
-    const {postId} = req.params;
-    const post = await postSchema.findById(postId);
-    const {password} = req.body;
-
-    if (password != post.password || !post) {
-      const err = new Error();
-      console.log("게시글이없어요");
-      throw err;
-    }
-
     console.log("삭제 시도");
     await postSchema.deleteOne({_id: postId});
     console.log("삭제 성공");
