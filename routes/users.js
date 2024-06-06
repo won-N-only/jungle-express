@@ -52,18 +52,17 @@ router.post("/login", async (req, res) => {
 
   console.log("로그인 시도 중 ");
   const nicknameCheck = await UserSchema.findOne({nickname: nickname});
-  const passwordCheck = await UserSchema.findOne({password: password});
 
-  if (nicknameCheck || passwordCheck)
+  if (!nicknameCheck || !(nicknameCheck.password === password))
     return res.status(400).json({errorMessage: "닉네임 패스워드 확인부탁"});
 
   const token = jwt.sign({nickname: nickname}, secretKey, {expiresIn: "30m"});
   console.log("로그인 성공 ");
 
   res
-    .cookie("authorization", `bearer${token}`)
+    .cookie("authorization", `bearer ${token}`)
     .status(200)
-    .json({token}, {result: "success"});
+    .json({token, result: "success"});
 });
 
 module.exports = router;
