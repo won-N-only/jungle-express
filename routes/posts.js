@@ -56,8 +56,8 @@ router.post("/", async (req, res) => {
 /** 게시글 조회 */
 router.get("/:postId", async (req, res) => {
   try {
-    console.log("조회 시도");
     const {postId} = req.params;
+    console.log("조회 시도");
     const post = await postSchema.findById(postId);
     console.log("조회 대 성 공");
 
@@ -88,6 +88,30 @@ router.patch("/:postId", async (req, res) => {
 
     await post.save();
     res.status(200).json({posts: post});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({errorMessage: "에러출동~~"});
+  }
+});
+
+/** 게시글 삭제 */
+router.delete("/:postId", async (req, res) => {
+  try {
+    const {postId} = req.params;
+    const post = await postSchema.findById(postId);
+    const {password} = req.body;
+
+    if (password != post.password || !post) {
+      const err = new Error();
+      console.log("게시글이없어요");
+      throw err;
+    }
+
+    console.log("삭제 시도");
+    await postSchema.deleteOne({_id: postId});
+    console.log("삭제 성공");
+
+    res.status(200).json({});
   } catch (err) {
     console.log(err);
     res.status(500).json({errorMessage: "에러출동~~"});
