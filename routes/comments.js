@@ -58,7 +58,8 @@ router.patch("/:commentId", authMiddleware, async (req, res) => {
     console.log("수정 시도");
     const comment = await commentSchema.findOne({_id: commentId});
 
-    if (comment.nickname !== res.locals.user.nickname)
+    const user = res.locals.user;
+    if (comment.nickname !== user.nickname)
       return res.status(400).json({errorMessage: "니 글 아니잖아"});
 
     comment.content = content;
@@ -74,9 +75,15 @@ router.patch("/:commentId", authMiddleware, async (req, res) => {
 });
 
 /** 댓글 삭제 */
-router.delete("/:commentId", async (req, res) => {
+router.delete("/:commentId", authMiddleware, async (req, res) => {
   try {
+    const user = res.locals.user;
     const {commentId} = req.params;
+    const comment = await commentSchema.findOne({_id: commentId});
+
+    if (comment.nickname !== user.nickname)
+      return res.status(400).json({errorMessage: "니 글 아니잖아"});
+
     await commentSchema.deleteOne({_id: commentId});
     res.send({});
   } catch (err) {
