@@ -6,16 +6,11 @@ const postSchema = require("../schemas/post.js");
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
-    const posts = await postSchema.find({}).sort("-date");
-    const results = posts.map((post) => {
-      return {
-        title: post.title,
-        writer: post.writer,
-        date: post.date,
-        postId: post.postId,
-      };
-    });
-    res.json({posts: results});
+    const posts = await postSchema
+      .find({}, {title: 1, writer: 1, date: 1, _id: 1})
+      .sort("-date");
+
+    res.json({posts: posts});
   } catch (err) {
     console.error(err);
     res.status(503).json({errorMessage: "데이터 베이스 펑퍼ㅓㅇㅇ"});
@@ -40,7 +35,7 @@ router.post("/", async (req, res) => {
       writer: writer,
       password: password,
       content: content,
-      date: new Date(),
+      date: new Date().toISOString(),
     });
 
     console.log("입력 대성공");
@@ -52,6 +47,20 @@ router.post("/", async (req, res) => {
 });
 
 /** 게시글 조회 */
+router.get("/:postId", async (req, res) => {
+  try {
+    console.log("조회 시도");
 
+    const {postId} = req.params;
+    const post = await postSchema.findById(postId);
+
+    console.log("조회 대 성 공");
+
+    res.json({posts: post}).status(200);
+  } catch (err) {
+    console.error(err);
+    res.status(502).json({errorMessage: "조 회 대 실 패 "});
+  }
+});
 
 module.exports = router;
