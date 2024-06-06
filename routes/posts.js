@@ -3,6 +3,12 @@ const router = express.Router();
 
 const postSchema = require("../schemas/post.js");
 
+/** 나중에 회원가입 만들면
+ * auth login 만들어서
+ * login해야 글 쓸수있게
+ * 내가 쓴거여야 수정/삭제할 수 있게
+ */
+
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
@@ -28,7 +34,6 @@ router.post("/", async (req, res) => {
   }
 
   console.log("입력 시도 중");
-
   try {
     const createPost = await postSchema.create({
       title: title,
@@ -60,6 +65,26 @@ router.get("/:postId", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "조 회 대 실 패 "});
+  }
+});
+
+/** 게시글 수정 */
+router.patch("/:postId", async (req, res) => {
+  try {
+    console.log("수정할 post 조회 시도");
+    const {postId} = req.params;
+    const post = await postSchema.findById(postId);
+    const {content} = req.body;
+    console.log("조회 대 성 공");
+
+    console.log("수정 시도");
+    post.content = content;
+    console.log("수정 성공");
+    await post.save();
+    res.status(200).json({posts: post});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({errorMessage: "에러출동~~"});
   }
 });
 
