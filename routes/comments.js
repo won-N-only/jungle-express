@@ -66,4 +66,16 @@ router.patch("/:commentId", async (req, res) => {
     res.status(500).json({errorMessage: "에러가 나타났다"});
   }
 });
+
+/** 댓글 삭제 */
+router.delete("/:commentId", async (req, res) => {
+  try {
+    const {commentId} = req.params;
+    await commentSchema.deleteOne({_id: commentId});
+    res.send({});
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 module.exports = router;
