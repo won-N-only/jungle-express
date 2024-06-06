@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const postSchema = require("../schemas/post.js");
+const authMiddleware = require("../middlewares/auth.js");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -23,21 +24,21 @@ router.get("/", async (req, res) => {
 });
 
 /** 게시글 작성 */
-router.post("/", async (req, res) => {
-  const {title, writer, password, content} = req.body;
+router.post("/", authMiddleware, async (req, res) => {
+  const {title, content} = req.body;
+  const {nickname} = res.locals.user;
 
-  /** 나중에 valid check로 바꾸기 */
-  if (!title || !writer || !password || !content) {
+  if (!title || !content) {
     console.log("입력 시도 실패");
     return res.status(400).json({errMessage: "입력폼을 다 채워주세요"});
   }
 
   try {
     console.log("입력 시도 중");
+    console.log(nickname);
     const createPost = await postSchema.create({
       title: title,
-      writer: writer,
-      password: password,
+      nickname: nickname,
       content: content,
       date: new Date().toISOString(),
     });
