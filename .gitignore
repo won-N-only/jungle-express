@@ -1,3 +1,13 @@
-./node_modules
-./package.json
-./package-lock.json
+# Node.js
+node_modules/
+.env
+
+# Logs
+*.log
+
+# Windows
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
