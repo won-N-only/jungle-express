@@ -4,9 +4,6 @@ const router = express.Router();
 const postSchema = require("../schemas/post.js");
 const authMiddleware = require("../middlewares/auth.js");
 
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
@@ -35,7 +32,6 @@ router.post("/", authMiddleware, async (req, res) => {
 
   try {
     console.log("입력 시도 중");
-    console.log(nickname);
     const createPost = await postSchema.create({
       title: title,
       nickname: nickname,
@@ -67,20 +63,18 @@ router.get("/:postId", async (req, res) => {
 });
 
 /** 게시글 수정 */
-router.patch("/:postId", async (req, res) => {
+router.patch("/:postId", authMiddleware, async (req, res) => {
   try {
     console.log("수정할 post 조회 시도");
     const {postId} = req.params;
-    const {password} = req.body;
     const post = await postSchema.findById(postId);
 
-    if (password != post.password || !post) {
-      const err = new Error();
-      throw err;
-    }
-    const {content} = req.body;
+    const writtenUser = res.locals.user;
+    if (post.nickname !== writtenUser.nickname)
+      return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
 
     console.log("수정 시도");
+    const {content} = req.body;
     post.content = content;
     console.log("수정 성공");
 
