@@ -7,10 +7,11 @@ connect();
 
 app.use(express.json()); // json 파싱해서 res.body에 담음 (urlencoded({extended: false}))는 html
 
-app.use("/api", []); // 아직 라우터 없어서 공란
+const indexRouter = require("./routes/index.js");
+app.use("/api", [indexRouter]); // 일단 index로 보냄
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("반갑습 니다 ㅎㅎ");
 });
 
 app.listen(port, () => {
