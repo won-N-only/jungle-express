@@ -4,6 +4,7 @@ const router = express.Router();
 const postSchema = require("../schemas/post.js");
 const commentSchema = require("../schemas/comment.js");
 const authMiddleware = require("../middlewares/auth.js");
+const auth = require("../middlewares/auth.js");
 
 /** 댓글 목록 조회 */
 router.get("/:postId", async (req, res) => {
@@ -21,7 +22,7 @@ router.get("/:postId", async (req, res) => {
 router.post("/:postId", authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const {content} = req.body;
-  
+
   const post = await postSchema.findOne({postId: postId});
   const user = await res.locals.user;
 
@@ -48,7 +49,7 @@ router.post("/:postId", authMiddleware, async (req, res) => {
 });
 
 /** 댓글 수정 */
-router.patch("/:commentId", async (req, res) => {
+router.patch("/:commentId", authMiddleware, async (req, res) => {
   const {commentId} = req.params;
   const {content} = req.body;
   if (!content) return res.json({result: "댓글 내용 입력좀"}).status(400);
@@ -56,7 +57,12 @@ router.patch("/:commentId", async (req, res) => {
   try {
     console.log("수정 시도");
     const comment = await commentSchema.findOne({_id: commentId});
+
+    if (comment.nickname !== res.locals.user.nickname)
+      return res.status(400).json({errorMessage: "니 글 아니잖아"});
+
     comment.content = content;
+
     comment.save();
     console.log("수정 성공");
 
