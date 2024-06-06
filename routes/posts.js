@@ -3,11 +3,8 @@ const router = express.Router();
 
 const postSchema = require("../schemas/post.js");
 
-/** 나중에 회원가입 만들면
- * auth login 만들어서
- * login해야 글 쓸수있게
- * 내가 쓴거여야 수정/삭제할 수 있게
- */
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
