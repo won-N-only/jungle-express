@@ -4,15 +4,21 @@ const router = express.Router();
 const postSchema = require("../schemas/post.js");
 
 router.get("/", async (req, res) => {
-  const posts = await postSchema.find({}).sort("-date");
-  const results = posts.map((post) => {
-    return {
-      title: title,
-      writer: writer,
-      date: date,
-    };
-  });
-  res.json({posts: results});
+  try {
+    const posts = await postSchema.find({}).sort("-date");
+    const results = posts.map((post) => {
+      return {
+        title: post.title,
+        writer: post.writer,
+        date: post.date,
+        postId: post.postId,
+      };
+    });
+    res.json({posts: results});
+  } catch (err) {
+    console.error(err);
+    res.status(503).json({errorMessage: "데이터 베이스 펑퍼ㅓㅇㅇ"});
+  }
 });
 
 router.post("/", async (req, res) => {
@@ -25,14 +31,21 @@ router.post("/", async (req, res) => {
   }
 
   console.log("입력 시도 중");
-  const createPost = await postSchema.create({
-    title: title,
-    writer: writer,
-    password: password,
-    content: content,
-    date: new Date(),
-  });
-  console.log("입력 대성공");
-  res.json({posts: createPost}).status(200);
+
+  try {
+    const createPost = await postSchema.create({
+      title: title,
+      writer: writer,
+      password: password,
+      content: content,
+      date: new Date(),
+    });
+
+    console.log("입력 대성공");
+    res.json({posts: createPost}).status(200);
+  } catch (err) {
+    console.error(err);
+    res.status(502).json({errorMessage: "입력 대 실 패 "});
+  }
 });
 module.exports = router;
