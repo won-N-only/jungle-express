@@ -36,9 +36,10 @@ router.post("/", async (req, res) => {
   if (existUser)
     return res.status(400).json({errorMessage: "중복된 닉네임입니당"});
 
+  const hashedPassword = await bcrypt.hash(password, 12);
   await UserSchema.create({
     nickname: nickname,
-    password: password,
+    password: hashedPassword,
   });
   console.log("가입 성공  ");
 
@@ -53,7 +54,7 @@ router.post("/login", async (req, res) => {
   console.log("로그인 시도 중 ");
   const nicknameCheck = await UserSchema.findOne({nickname: nickname});
 
-  if (!nicknameCheck || !(nicknameCheck.password === password))
+  if (!nicknameCheck || !bcrypt.compare(password, nicknameCheck.password))
     return res.status(400).json({errorMessage: "닉네임 패스워드 확인부탁"});
 
   const token = jwt.sign({nickname: nickname}, secretKey, {expiresIn: "30m"});
