@@ -53,6 +53,7 @@ router.get("/:postId", async (req, res) => {
     const {postId} = req.params;
     console.log("조회 시도");
     const post = await postSchema.findById(postId);
+    if (!post) res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
     res.json({posts: post, result: "success"}).status(200);
