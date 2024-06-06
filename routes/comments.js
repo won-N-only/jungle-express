@@ -9,7 +9,7 @@ router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
     const comments = await commentSchema.find({postId: postId}).sort("-date");
-    res.status(200).json({comments: comments});
+    res.status(200).json({comments: comments, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(500).json({errorMessage: "에러출동~~"});
@@ -39,7 +39,7 @@ router.post("/:postId", async (req, res) => {
     });
     console.log("댓글 작 성성 공 ");
 
-    res.json({posts: createComment}).status(200);
+    res.json({posts: createComment, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(500).json({errorMessage: "  에 러 등 장"});

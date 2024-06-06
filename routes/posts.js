@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
       .sort("-date");
 
     console.log("전체 조회 성 공");
-    res.json({posts: posts});
+    res.json({posts: posts, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(503).json({errorMessage: "데이터 베이스 펑퍼ㅓㅇㅇ"});
@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
     });
     console.log("입력 대성공");
 
-    res.json({posts: createPost}).status(200);
+    res.json({posts: createPost, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "입력 대 실 패 "});
@@ -61,7 +61,7 @@ router.get("/:postId", async (req, res) => {
     const post = await postSchema.findById(postId);
     console.log("조회 대 성 공");
 
-    res.json({posts: post}).status(200);
+    res.json({posts: post, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "조 회 대 실 패 "});
@@ -87,7 +87,7 @@ router.patch("/:postId", async (req, res) => {
     console.log("수정 성공");
 
     await post.save();
-    res.status(200).json({posts: post});
+    res.status(200).json({posts: post, result: "success"});
   } catch (err) {
     console.log(err);
     res.status(500).json({errorMessage: "에러출동~~"});
@@ -111,7 +111,7 @@ router.delete("/:postId", async (req, res) => {
     await postSchema.deleteOne({_id: postId});
     console.log("삭제 성공");
 
-    res.status(200).json({});
+    res.status(200).json({result: "success"});
   } catch (err) {
     console.log(err);
     res.status(500).json({errorMessage: "에러출동~~"});
