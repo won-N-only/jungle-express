@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   try {
     console.log("전체 조회 시도 중");
     const posts = await postSchema
-      .find({}, {title: 1, writer: 1, date: 1, _id: 1})
+      .find({}, {title: 1, nickname: 1, date: 1, _id: 1})
       .sort("-date");
 
     console.log("전체 조회 성 공");
