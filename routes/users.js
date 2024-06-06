@@ -65,7 +65,7 @@ router.post("/login", async (req, res) => {
     console.log("로그인 성공 ");
 
     res
-      .cookie("authorization", `bearer ${token}`)
+      .cookie("authorization", `Bearer ${token}`)
       .status(200)
       .json({token, result: "success"});
   } catch (err) {
