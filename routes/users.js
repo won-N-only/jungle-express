@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const UserSchema = require("../schemas/user.js");
-
+const {route} = require("./comments.js");
 
 /** 회원가입 */
 function validateNickname(nickname) {
@@ -22,6 +22,7 @@ function validatePassword(password, nickname) {
 router.post("/", async (req, res) => {
   const {nickname, password, confirmPassword} = req.body;
 
+  console.log("가입 시도  ");
   const nickErr = validateNickname(nickname);
   if (nickErr) return res.status(400).json({errorMessage: nickErr});
 
@@ -39,9 +40,30 @@ router.post("/", async (req, res) => {
     nickname: nickname,
     password: password,
   });
+  console.log("가입 성공  ");
 
   res.status(200).json({result: "success"});
 });
 
+/** 로그인 */
+const secretKey = "아잠온다집에가고싶다";
+router.post("/login", async (req, res) => {
+  const {nickname, password} = req.body;
+
+  console.log("로그인 시도 중 ");
+  const nicknameCheck = await UserSchema.findOne({nickname: nickname});
+  const passwordCheck = await UserSchema.findOne({password: password});
+
+  if (nicknameCheck || passwordCheck)
+    return res.status(400).json({errorMessage: "닉네임 패스워드 확인부탁"});
+
+  const token = jwt.sign({nickname: nickname}, secretKey, {expiresIn: "30m"});
+  console.log("로그인 성공 ");
+
+  res
+    .cookie("authorization", `bearer${token}`)
+    .status(200)
+    .json({token}, {result: "success"});
+});
 
 module.exports = router;
