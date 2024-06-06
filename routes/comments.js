@@ -18,13 +18,14 @@ router.get("/:postId", async (req, res) => {
 });
 
 /** 댓글 작성 */
-router.post("/:postId", async (req, res) => {
-  console.log("엘렐레");
+router.post("/:postId", authMiddleware, async (req, res) => {
   const {postId} = req.params;
-  const {writer, password, content} = req.body;
-  const post = await postSchema.find({postId: postId});
+  const {content} = req.body;
+  
+  const post = await postSchema.findOne({postId: postId});
+  const user = await res.locals.user;
 
-  if (!writer || !password || !content || !post) {
+  if (!content || !post) {
     console.error("입력 안한게있네용");
     return res.status(400).json({errorMessage: "입력 안한게 있네용"});
   }
@@ -32,8 +33,7 @@ router.post("/:postId", async (req, res) => {
   try {
     console.log("댓글 작성 시도");
     const createComment = await commentSchema.create({
-      writer: writer,
-      password: password,
+      nickname: user.nickname,
       date: new Date().toISOString(),
       content: content,
       postId: postId,
