@@ -9,10 +9,12 @@ module.exports = async (req, res, next) => {
 
   if (!token || type !== "Bearer")
     return res.status(400).json({errorMessage: " 로그인 제대로 한것 맞니?"});
+
   try {
     const {nickname} = jwt.verify(token, secretKey);
-    const user = userSchema.findOne({nickname: nickname});
+    const user = await userSchema.findOne({nickname: nickname});
     res.locals.user = user;
+
     next();
   } catch (err) {
     console.log(err);
