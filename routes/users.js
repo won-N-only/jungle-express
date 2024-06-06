@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const UserSchema = require("../schemas/user.js");
+
 
 /** 회원가입 */
 function validateNickname(nickname) {
@@ -15,6 +18,7 @@ function validatePassword(password, nickname) {
   if (password.includes(nickname)) return "비번안에 닉이 있어요";
   return null;
 }
+
 router.post("/", async (req, res) => {
   const {nickname, password, confirmPassword} = req.body;
 
@@ -36,7 +40,8 @@ router.post("/", async (req, res) => {
     password: password,
   });
 
-  res.status(200).json({result:"success"});
+  res.status(200).json({result: "success"});
 });
+
 
 module.exports = router;
