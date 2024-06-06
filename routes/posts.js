@@ -3,6 +3,7 @@ const router = express.Router();
 
 const postSchema = require("../schemas/post.js");
 
+/**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
     const posts = await postSchema.find({}).sort("-date");
@@ -21,6 +22,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+/** 게시글 작성 */
 router.post("/", async (req, res) => {
   const {title, writer, password, content} = req.body;
 
@@ -48,4 +50,8 @@ router.post("/", async (req, res) => {
     res.status(502).json({errorMessage: "입력 대 실 패 "});
   }
 });
+
+/** 게시글 조회 */
+
+
 module.exports = router;
