@@ -12,8 +12,7 @@ module.exports = async (req, res, next) => {
 
   try {
     const {nickname} = jwt.verify(token, secretKey);
-    const user = await userSchema.findOne({nickname: nickname});
-    res.locals.user = user;
+    res.locals.nickname = nickname;
 
     next();
   } catch (err) {
