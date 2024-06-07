@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 /** 게시글 작성 */
 router.post("/", authMiddleware, async (req, res) => {
   const {title, content} = req.body;
-  const {nickname} = res.locals.user;
+  const nickname = res.locals.nickname;
 
   if (!title || !content) {
     console.log("입력 시도 실패");
@@ -70,8 +70,8 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
     const {postId} = req.params;
     const post = await postSchema.findById(postId);
 
-    const writtenUser = res.locals.user;
-    if (post.nickname !== writtenUser.nickname)
+    const nickname = res.locals.nickname;
+    if (post.nickname !== nickname)
       return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
 
     console.log("수정 시도");
@@ -98,8 +98,8 @@ router.delete("/:postId", authMiddleware, async (req, res) => {
     throw err;
   }
 
-  const writtenUser = res.locals.user;
-  if (post.nickname !== writtenUser.nickname)
+  const nickname = res.locals.nickname;
+  if (post.nickname !== nickname)
     return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
 
   try {

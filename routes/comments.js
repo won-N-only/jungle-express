@@ -5,12 +5,14 @@ const postSchema = require("../schemas/post.js");
 const commentSchema = require("../schemas/comment.js");
 const authMiddleware = require("../middlewares/auth.js");
 const auth = require("../middlewares/auth.js");
+const {log} = require("console");
 
 /** 댓글 목록 조회 */
 router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
     const comments = await commentSchema.find({postId: postId}).sort("-date");
+    console.log("댓글 조회 성공");
     res.status(200).json({comments: comments, result: "success"});
   } catch (err) {
     console.error(err);
@@ -23,8 +25,8 @@ router.post("/:postId", authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const {content} = req.body;
 
-  const post = await postSchema.findOne({postId: postId});
-  const user = await res.locals.user;
+  const post = await postSchema.findById(postId);
+  const nickname = res.locals.nickname;
 
   if (!content || !post) {
     console.error("입력 안한게있네용");
@@ -34,7 +36,7 @@ router.post("/:postId", authMiddleware, async (req, res) => {
   try {
     console.log("댓글 작성 시도");
     const createComment = await commentSchema.create({
-      nickname: user.nickname,
+      nickname: nickname,
       date: new Date().toISOString(),
       content: content,
       postId: postId,
@@ -57,9 +59,11 @@ router.patch("/:commentId", authMiddleware, async (req, res) => {
   try {
     console.log("수정 시도");
     const comment = await commentSchema.findOne({_id: commentId});
+    if (!comment) return res.status(400).json({errorMessage: "글이없어"});
 
-    const user = res.locals.user;
-    if (comment.nickname !== user.nickname)
+    const nickname = res.locals.nickname;
+
+    if (comment.nickname !== nickname)
       return res.status(400).json({errorMessage: "니 글 아니잖아"});
 
     comment.content = content;
@@ -77,11 +81,12 @@ router.patch("/:commentId", authMiddleware, async (req, res) => {
 /** 댓글 삭제 */
 router.delete("/:commentId", authMiddleware, async (req, res) => {
   try {
-    const user = res.locals.user;
+    const nickname = res.locals.nickname;
     const {commentId} = req.params;
     const comment = await commentSchema.findOne({_id: commentId});
+    if (!comment) return res.status(400).json({errorMessage: "글이없어"});
 
-    if (comment.nickname !== user.nickname)
+    if (comment.nickname !== nickname)
       return res.status(400).json({errorMessage: "니 글 아니잖아"});
 
     await commentSchema.deleteOne({_id: commentId});
