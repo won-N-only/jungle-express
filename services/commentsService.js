@@ -9,22 +9,22 @@ module.exports = class commentService {
     this.postSchema = PostSchema;
   }
 
-  async getComment(postId) {
-    return await this.commentSchema.getComment(postId);
+  getComment(postId) {
+    return this.commentSchema.getComment(postId);
   }
 
-  async postComment(comment) {
-    const post = await this.postSchema.findPost(comment.postId);
+  postComment(comment) {
+    const post = this.postSchema.findPost(comment.postId);
     if (!post.length) throw new Error("포스트가없어");
 
-    return await this.commentSchema.postComment(comment);
+    return this.commentSchema.postComment(comment);
   }
 
-  async updateComment(commentId, nickname, content) {
-    return await this.commentSchema.updateComment(commentId, nickname, content);
+  updateComment(commentId, nickname, content) {
+    return this.commentSchema.updateComment(commentId, nickname, content);
   }
 
-  async deleteComment(commentId, nickname) {
-    return await this.commentSchema.deleteComment(nickname, postId);
+  deleteComment(commentId, nickname) {
+    return this.commentSchema.deleteComment(commentId, nickname);
   }
 };

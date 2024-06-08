@@ -9,9 +9,9 @@ const CommentService = new commentService();
 router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
-    const comments = await CommentService.getComment(postId);
+    const getComment = await CommentService.getComment(postId);
     console.log("댓글 조회 성공");
-    res.status(200).json({comments: comments, result: "success"});
+    res.status(200).json({comments: getComment, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(500).json({errorMessage: "에러출동~~"});
@@ -32,7 +32,7 @@ router.post("/:postId", authMiddleware, async (req, res) => {
 
   try {
     console.log("댓글 작성 시도");
-    const createComment = await CommentService.postComment({
+    const postComment = await CommentService.postComment({
       nickname,
       content,
       postId,
@@ -40,7 +40,7 @@ router.post("/:postId", authMiddleware, async (req, res) => {
     });
     console.log("댓글 작 성성 공 ");
 
-    res.json({posts: createComment, result: "success"}).status(200);
+    res.json({comments: postComment, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(404).json({errorMessage: err.message});
@@ -51,24 +51,22 @@ router.post("/:postId", authMiddleware, async (req, res) => {
 router.patch("/:commentId", authMiddleware, async (req, res) => {
   const {commentId} = req.params;
   const {content} = req.body;
+  const nickname = res.locals.nickname;
   if (!content) return res.json({result: "댓글 내용 입력좀"}).status(400);
 
   try {
     console.log("수정 시도");
-    const comment = await commentSchema.findOne({_id: commentId});
-    if (!comment) return res.status(400).json({errorMessage: "글이없어"});
+    const updateComment = await CommentService.updateComment(
+      commentId,
+      nickname,
+      content
+    );
 
-    const nickname = res.locals.nickname;
-
-    if (comment.nickname !== nickname)
+    if (!updateComment)
       return res.status(400).json({errorMessage: "니 글 아니잖아"});
-
-    comment.content = content;
-
-    comment.save();
     console.log("수정 성공");
 
-    res.status(200).json({comment: comment, result: "success"});
+    res.status(200).json({comments: updateComment, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(500).json({errorMessage: "에러가 나타났다"});
@@ -80,16 +78,15 @@ router.delete("/:commentId", authMiddleware, async (req, res) => {
   try {
     const nickname = res.locals.nickname;
     const {commentId} = req.params;
-    const comment = await commentSchema.findOne({_id: commentId});
-    if (!comment) return res.status(400).json({errorMessage: "글이없어"});
-
-    if (comment.nickname !== nickname)
-      return res.status(400).json({errorMessage: "니 글 아니잖아"});
-
-    await commentSchema.deleteOne({_id: commentId});
-    res.send({});
+    const deleteComment = await CommentService.deleteComment(
+      commentId,
+      nickname
+    );
+    if (!deleteComment) throw new Error("댓글이 없다잉");
+    res.send({comments: deleteComment});
   } catch (err) {
     console.error(err);
+    res.status(404).json({errorMessage: "에러가 나타났다"});
   }
 });
 

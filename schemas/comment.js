@@ -14,17 +14,17 @@ const commentSchema = new mongoose.Schema(
 const CommentSchema = mongoose.model("comment", commentSchema);
 
 module.exports = class mongooseComment {
-  async getComment(postId) {
-    return await CommentSchema.find({postId: postId}).sort("-date");
+  getComment(postId) {
+    return CommentSchema.find({postId: postId}).sort("-date");
   }
 
-  async postComment(comment) {
+  postComment(comment) {
     const newComment = new CommentSchema(comment);
-    return await newComment.save();
+    return newComment.save();
   }
 
-  async updateComment(commentId, nickname, content) {
-    return await CommentSchema.findOneAndUpdate(
+  updateComment(commentId, nickname, content) {
+    return CommentSchema.findOneAndUpdate(
       {
         _id: commentId,
         nickname: nickname,
@@ -34,15 +34,15 @@ module.exports = class mongooseComment {
     );
   }
 
-  async deleteComment(commentId, nickname) {
-    return await CommentSchema.findOneAndDelete({
+  deleteComment(commentId, nickname) {
+    return CommentSchema.findOneAndDelete({
       _id: commentId,
       nickname: nickname,
     });
   }
 
-  async deleteComments(postId, nickname) {
-    return await CommentSchema.deleteMany({
+  deleteComments(postId, nickname) {
+    return CommentSchema.deleteMany({
       postId: postId,
       nickname: nickname,
     });
