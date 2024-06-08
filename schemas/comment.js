@@ -17,10 +17,12 @@ module.exports = class mongooseComment {
   async getComment(postId) {
     return await CommentSchema.find({postId: postId}).sort("-date");
   }
+
   async postComment(comment) {
     const newComment = new CommentSchema(comment);
     return await newComment.save();
   }
+
   async updateComment(commentId, nickname, content) {
     return await CommentSchema.findOneAndUpdate(
       {
@@ -31,9 +33,17 @@ module.exports = class mongooseComment {
       {new: true}
     );
   }
+
   async deleteComment(commentId, nickname) {
     return await CommentSchema.findOneAndDelete({
       _id: commentId,
+      nickname: nickname,
+    });
+  }
+
+  async deleteComments(postId, nickname) {
+    return await CommentSchema.deleteMany({
+      postId: postId,
       nickname: nickname,
     });
   }

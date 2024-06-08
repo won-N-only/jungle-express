@@ -3,13 +3,13 @@ const router = express.Router();
 const commentService = require("../services/commentsService.js");
 const authMiddleware = require("../middlewares/auth.js");
 
-const CommentService = new commentService( );
+const CommentService = new commentService();
 
 /** 댓글 목록 조회 */
 router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
-    const comments = await commentSchema.find({postId: postId}).sort("-date");
+    const comments = await CommentService.getComment(postId);
     console.log("댓글 조회 성공");
     res.status(200).json({comments: comments, result: "success"});
   } catch (err) {
@@ -23,28 +23,27 @@ router.post("/:postId", authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const {content} = req.body;
 
-  const post = await postSchema.findById(postId);
   const nickname = res.locals.nickname;
 
-  if (!content || !post) {
+  if (!content) {
     console.error("입력 안한게있네용");
     return res.status(400).json({errorMessage: "입력 안한게 있네용"});
   }
 
   try {
     console.log("댓글 작성 시도");
-    const createComment = await commentSchema.create({
-      nickname: nickname,
+    const createComment = await CommentService.postComment({
+      nickname,
+      content,
+      postId,
       date: new Date().toISOString(),
-      content: content,
-      postId: postId,
     });
     console.log("댓글 작 성성 공 ");
 
     res.json({posts: createComment, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
-    res.status(500).json({errorMessage: "  에 러 등 장"});
+    res.status(404).json({errorMessage: err.message});
   }
 });
 
