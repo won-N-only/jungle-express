@@ -69,7 +69,7 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 
     console.log("수정 시도");
     const post = await PostService.updatePost(postId, nickname, content);
-        
+
     if (!post) return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("수정 성공");
 
@@ -87,14 +87,11 @@ router.delete("/:postId", authMiddleware, async (req, res) => {
   try {
     console.log("삭제 시도");
 
-    const deletedPost = await postSchema.findOneAndDelete({
-      nickname: nickname,
-      _id: postId,
-    });
+    const deletedPost = await PostService.deletePost(nickname, postId);
 
     if (!deletedPost) {
       console.log("삭제 실패");
-      return res.status(404).json({errorMessage: "게시글이없다"});
+      return res.status(404).json({errorMessage: "없는데 ??"});
     }
 
     console.log("삭제 성공");
