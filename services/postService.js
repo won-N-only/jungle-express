@@ -19,7 +19,7 @@ module.exports = class postService {
     return await this.postSchema.updatePost(postId, nickname, content);
   }
 
-  async deletePost(post) {
-    return await this.postSchema.deletePost(post);
+  async deletePost(nickname, postId) {
+    return await this.postSchema.deletePost(nickname, postId);
   }
 };
