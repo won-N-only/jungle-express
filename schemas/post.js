@@ -15,23 +15,22 @@ const PostSchema = mongoose.model("Post", postSchema);
 
 module.exports = class mongoosePost {
   async getPosts() {
-    return await PostSchema.find(
-      {},
-      {title: 1, nickname: 1, date: 1, _id: 1}
-    ).sort("-date");
+    return PostSchema.find({}, {title: 1, nickname: 1, date: 1, _id: 1}).sort(
+      "-date"
+    );
   }
 
   async postPost(post) {
     const newPost = new PostSchema(post);
-    return await newPost.save();
+    return newPost.save();
   }
 
   async findPost(postId) {
-    return await PostSchema.find({_id: postId});
+    return PostSchema.find({_id: postId});
   }
 
   async updatePost(postId, nickname, content) {
-    return await PostSchema.findOneAndUpdate(
+    return PostSchema.findOneAndUpdate(
       {_id: postId, nickname: nickname},
       {$set: {content: content}},
       {new: true}
@@ -39,7 +38,7 @@ module.exports = class mongoosePost {
   }
 
   async deletePost(nickname, postId) {
-    return await PostSchema.findOneAndDelete({
+    return PostSchema.findOneAndDelete({
       nickname: nickname,
       _id: postId,
     });
