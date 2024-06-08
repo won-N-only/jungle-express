@@ -69,7 +69,8 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 
     console.log("수정 시도");
     const post = await PostService.updatePost(postId, nickname, content);
-    if (!post) return res.status(500).json({errorMessage: "에러출동~~"});
+        
+    if (!post) return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("수정 성공");
 
     res.status(200).json({posts: post, result: "success"});
