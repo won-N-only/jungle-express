@@ -14,8 +14,27 @@ const commentSchema = new mongoose.Schema(
 const CommentSchema = mongoose.model("comment", commentSchema);
 
 module.exports = class mongooseComment {
-  async getComment() {}
-  async postComment() {}
-  async updateComment() {}
-  async deleteComment() {}
+  async getComment(postId) {
+    return await CommentSchema.find({postId: postId}).sort("-date");
+  }
+  async postComment(comment) {
+    const newComment = new CommentSchema(comment);
+    return await newComment.save();
+  }
+  async updateComment(commentId, nickname, content) {
+    return await CommentSchema.findOneAndUpdate(
+      {
+        _id: commentId,
+        nickname: nickname,
+      },
+      {$set: {content: content}},
+      {new: true}
+    );
+  }
+  async deleteComment(commentId, nickname) {
+    return await CommentSchema.findOneAndDelete({
+      _id: commentId,
+      nickname: nickname,
+    });
+  }
 };
