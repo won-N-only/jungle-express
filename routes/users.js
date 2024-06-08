@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const config = require("../config/index.js");
 const UserSchema = require("../schemas/user.js");
 
 /** 회원가입 */
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
 });
 
 /** 로그인 */
-const secretKey = process.env.secretKey;
+const secretKey = config.secretKey;
 router.post("/login", async (req, res) => {
   const {nickname, password} = req.body;
 
@@ -61,6 +61,7 @@ router.post("/login", async (req, res) => {
 
   if (!nicknameCheck || !bcrypt.compare(password, nicknameCheck.password))
     return res.status(400).json({errorMessage: "닉네임 패스워드 확인부탁"});
+
   try {
     const token = jwt.sign({nickname: nickname}, secretKey, {expiresIn: "30m"});
     console.log("로그인 성공 ");

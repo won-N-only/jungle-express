@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const config = require("../config/index.js");
 
 /** 로그인 확인 미들웨어 */
-const secretKey = process.env.secretKey;
+const secretKey = config.secretKey;
 module.exports = (req, res, next) => {
   const {authorization} = req.cookies;
   const [type, token] = (authorization ?? "").split(" ");

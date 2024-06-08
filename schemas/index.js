@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
+const config = require("../config/index.js");
 
 /** 첫 연결 */
 const connect = () => {
-  mongoose
-    .connect("mongodb://localhost:27017/JUNGLE-EXPRESS")
-    .catch((err) => console.log(err));
+  mongoose.connect(config.mongoURI).catch((err) => console.log(err));
 };
 
 /** 연결 event handle */
