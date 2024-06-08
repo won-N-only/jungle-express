@@ -10,6 +10,8 @@ router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
     const getComment = await CommentService.getComment(postId);
+    if (!getComment.length)
+      return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("댓글 조회 성공");
     res.status(200).json({comments: getComment, result: "success"});
   } catch (err) {
