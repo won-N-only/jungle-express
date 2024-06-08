@@ -1,9 +1,8 @@
-const userSchema = require("../schemas/user.js");
 const jwt = require("jsonwebtoken");
 
 /** 로그인 확인 미들웨어 */
-const secretKey = "아잠온다집에가고싶다";
-module.exports = async (req, res, next) => {
+const secretKey = process.env.secretKey;
+module.exports = (req, res, next) => {
   const {authorization} = req.cookies;
   const [type, token] = (authorization ?? "").split(" ");
 

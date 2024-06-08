@@ -1,6 +1,8 @@
 # Node.js
 node_modules/
 .env
+package.json
+package-lock.json
 
 # Logs
 *.log

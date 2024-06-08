@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const port = 8080;
+require("dotenv").config({override: false});
+const port = process.env.port || 3030;
 const cookieParser = require("cookie-parser");
 const connect = require("./schemas/index.js");
 connect();

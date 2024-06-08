@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const UserSchema = require("../schemas/user.js");
-const {route} = require("./comments.js");
 
 /** 회원가입 */
 function validateNickname(nickname) {
@@ -13,9 +12,10 @@ function validateNickname(nickname) {
   return null;
 }
 
-function validatePassword(password, nickname) {
+function validatePassword(password, nickname, confirmPassword) {
   if (password.length < 4) return "비밀번호는 4자이상";
   if (password.includes(nickname)) return "비번안에 닉이 있어요";
+  if (password !== confirmPassword) return "비밀번호달라요";
   return null;
 }
 
@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
   const nickErr = validateNickname(nickname);
   if (nickErr) return res.status(400).json({errorMessage: nickErr});
 
-  const pwdErr = validatePassword(password, nickname);
+  const pwdErr = validatePassword(password, nickname, confirmPassword);
   if (pwdErr) return res.status(400).json({errorMessage: pwdErr});
 
   if (password !== confirmPassword)
@@ -35,6 +35,7 @@ router.post("/", async (req, res) => {
   const existUser = await UserSchema.findOne({nickname: nickname});
   if (existUser)
     return res.status(400).json({errorMessage: "중복된 닉네임입니당"});
+
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await UserSchema.create({
@@ -51,7 +52,7 @@ router.post("/", async (req, res) => {
 });
 
 /** 로그인 */
-const secretKey = "아잠온다집에가고싶다";
+const secretKey = process.env.secretKey;
 router.post("/login", async (req, res) => {
   const {nickname, password} = req.body;
 
