@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
-const postSchema = require("../schemas/post.js");
-const commentSchema = require("../schemas/comment.js");
+const commentService = require("../services/commentsService.js");
 const authMiddleware = require("../middlewares/auth.js");
+
+const CommentService = new commentService( );
 
 /** 댓글 목록 조회 */
 router.get("/:postId", async (req, res) => {
