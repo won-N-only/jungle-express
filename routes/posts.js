@@ -53,7 +53,7 @@ router.get("/:postId", async (req, res) => {
     const {postId} = req.params;
     console.log("조회 시도");
     const post = await postSchema.findById(postId);
-    if (!post) res.status(400).json({errorMessage: "post 없음"});
+    if (!post) return res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
     res.json({posts: post, result: "success"}).status(200);
@@ -90,21 +90,19 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 /** 게시글 삭제 */
 router.delete("/:postId", authMiddleware, async (req, res) => {
   const {postId} = req.params;
-  const post = await postSchema.findById(postId);
-
-  if (!post) {
-    const err = new Error();
-    console.error("게시글이없어요");
-    throw err;
-  }
-
   const nickname = res.locals.nickname;
-  if (post.nickname !== nickname)
-    return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
-
   try {
     console.log("삭제 시도");
-    await postSchema.deleteOne({_id: postId});
+    const deletedPost = await postSchema.findOneAndDelete({
+      nickname: nickname,
+      _id: postId,
+    });
+
+    if (!deletedPost) {
+      console.log("삭제 실패");
+      return res.status(404).json({errorMessage: "게시글이없다"});
+    }
+
     console.log("삭제 성공");
 
     res.status(200).json({result: "success"});
