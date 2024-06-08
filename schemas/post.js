@@ -38,10 +38,10 @@ module.exports = class mongoosePost {
     );
   }
 
-  async deletePost(postId, nickname) {
+  async deletePost(nickname, postId) {
     return await PostSchema.findOneAndDelete({
+      nickname: nickname,
       _id: postId,
-      author: nickname,
-    }).exec();
+    });
   }
 };
