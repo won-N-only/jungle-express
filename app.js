@@ -1,20 +1,16 @@
 const express = require("express");
-const app = express();
-require("dotenv").config({override: false});
-const port = process.env.port || 3030;
-const cookieParser = require("cookie-parser");
-const connect = require("./schemas/index.js");
-connect();
+const loaders = require("./loaders/index");
+const config = require("./config/index");
 
-app.use(express.json()); // json 파싱해서 res.body에 담음 (urlencoded({extended: false}))는 html
-app.use(cookieParser()); // 쿠키 파싱해서 user.cookies 등으로 쓸 수 있게함
-const indexRouter = require("./routes/index.js");
-app.use("/api", [indexRouter]); // 일단 index로 보냄
+async function start() {
+  const app = express();
 
-app.get("/", (req, res) => {
-  res.send("🍺🍕 🍻반가워요 🍻🍕🍺"); // 여기에 async 안걸고 여러줄 적으면 터져
-});
+  /** init으로 여러 함수 한번에 받은 */
+  await loaders.init({app: app});
 
-app.listen(port, () => {
-  console.log(port, "포트로 서버가 열렸어요!");
-});
+  app.listen(config.port, () => {
+    console.log(config.port, " 포트로 서버가 열렸어요!");
+  });
+}
+
+start();
