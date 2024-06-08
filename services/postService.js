@@ -3,8 +3,8 @@ module.exports = class postService {
     this.postSchema = postSchema;
   }
 
-  async getPosts(post) {
-    return await this.postSchema.getPosts(post);
+  async getPosts() {
+    return await this.postSchema.getPosts();
   }
 
   async postPost(post) {
