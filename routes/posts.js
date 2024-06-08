@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
-
+const postService = require("../services/postService.js");
 const postSchema = require("../schemas/post.js");
 const authMiddleware = require("../middlewares/auth.js");
+
+const PostService = new postService(new postSchema());
 
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
     console.log("전체 조회 시도 중");
-    const posts = await postSchema
-      .find({}, {title: 1, nickname: 1, date: 1, _id: 1})
-      .sort("-date");
-
+    const posts = await PostService.getPosts();
     console.log("전체 조회 성 공");
+
     res.json({posts: posts, result: "success"});
   } catch (err) {
     console.error(err);
@@ -32,12 +32,8 @@ router.post("/", authMiddleware, async (req, res) => {
 
   try {
     console.log("입력 시도 중");
-    const createPost = await postSchema.create({
-      title: title,
-      nickname: nickname,
-      content: content,
-      date: new Date().toISOString(),
-    });
+    const post = {title, content, nickname, date: new Date().toISOString()};
+    const createPost = await PostService.postPost(post);
     console.log("입력 대성공");
 
     res.json({posts: createPost, result: "success"}).status(200);
@@ -52,7 +48,7 @@ router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
     console.log("조회 시도");
-    const post = await postSchema.findById(postId);
+    const post = await PostService.findPost(postId);
     if (!post) return res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
@@ -68,18 +64,14 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
   try {
     console.log("수정할 post 조회 시도");
     const {postId} = req.params;
-    const post = await postSchema.findById(postId);
-
+    const {content} = req.body;
     const nickname = res.locals.nickname;
-    if (post.nickname !== nickname)
-      return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
 
     console.log("수정 시도");
-    const {content} = req.body;
-    post.content = content;
+    const post = await PostService.updatePost(postId, nickname, content);
+    if (!post) return res.status(500).json({errorMessage: "에러출동~~"});
     console.log("수정 성공");
 
-    await post.save();
     res.status(200).json({posts: post, result: "success"});
   } catch (err) {
     console.log(err);
@@ -93,6 +85,7 @@ router.delete("/:postId", authMiddleware, async (req, res) => {
   const nickname = res.locals.nickname;
   try {
     console.log("삭제 시도");
+
     const deletedPost = await postSchema.findOneAndDelete({
       nickname: nickname,
       _id: postId,
