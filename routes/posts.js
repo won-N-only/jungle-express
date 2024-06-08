@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const postService = require("../services/postService.js");
-const postSchema = require("../schemas/post.js");
 const authMiddleware = require("../middlewares/auth.js");
 
-const PostService = new postService(new postSchema());
+const PostService = new postService();
 
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
@@ -33,10 +32,10 @@ router.post("/", authMiddleware, async (req, res) => {
   try {
     console.log("입력 시도 중");
     const post = {title, content, nickname, date: new Date().toISOString()};
-    const createPost = await PostService.postPost(post);
+    const postPost = await PostService.postPost(post);
     console.log("입력 대성공");
 
-    res.json({posts: createPost, result: "success"}).status(200);
+    res.json({posts: postPost, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "입력 대 실 패 "});
@@ -48,11 +47,11 @@ router.get("/:postId", async (req, res) => {
   try {
     const {postId} = req.params;
     console.log("조회 시도");
-    const post = await PostService.findPost(postId);
-    if (!post) return res.status(400).json({errorMessage: "post 없음"});
+    const findPost = await PostService.findPost(postId);
+    if (!findPost) return res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
-    res.json({posts: post, result: "success"}).status(200);
+    res.json({posts: findPost, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "조 회 대 실 패 "});
@@ -68,12 +67,12 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
     const nickname = res.locals.nickname;
 
     console.log("수정 시도");
-    const post = await PostService.updatePost(postId, nickname, content);
+    const findPost = await PostService.updatePost(postId, nickname, content);
 
-    if (!post) return res.status(404).json({errorMessage: "에러출동~~"});
+    if (!findPost) return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("수정 성공");
 
-    res.status(200).json({posts: post, result: "success"});
+    res.status(200).json({posts: findPost, result: "success"});
   } catch (err) {
     console.log(err);
     res.status(500).json({errorMessage: "에러출동~~"});

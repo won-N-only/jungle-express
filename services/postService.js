@@ -1,6 +1,10 @@
+const postSchema = require("../schemas/post.js");
+
+const PostSchema = new postSchema();
+
 module.exports = class postService {
-  constructor(postSchema) {
-    this.postSchema = postSchema;
+  constructor() {
+    this.postSchema = PostSchema;
   }
 
   async getPosts() {
