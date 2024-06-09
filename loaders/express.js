@@ -2,8 +2,10 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const routes = require("../routes/index");
 const {swaggerUi, specs} = require("../config/swagger.js");
+const cors = require('cors');
 
 module.exports = ({app}) => {
+  app.use(cors());
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
   app.use(express.json());
   app.use(cookieParser());
