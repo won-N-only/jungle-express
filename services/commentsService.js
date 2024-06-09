@@ -1,12 +1,9 @@
 const commentSchema = require("../schemas/comment.js");
 const CommentSchema = new commentSchema();
-const postSchema = require("../schemas/post.js");
-const PostSchema = new postSchema();
 
 module.exports = class commentService {
   constructor() {
     this.commentSchema = CommentSchema;
-    this.postSchema = PostSchema;
   }
 
   getComment(postId) {
@@ -14,9 +11,6 @@ module.exports = class commentService {
   }
 
   postComment(comment) {
-    const post = this.postSchema.findPost(comment.postId);
-    if (!post) throw new Error("포스트가없어");
-
     return this.commentSchema.postComment(comment);
   }
 

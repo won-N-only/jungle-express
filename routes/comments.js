@@ -90,7 +90,7 @@ router.delete("/:commentId", verify.comm, authMiddleware, async (req, res) => {
       nickname
     );
     if (!deleteComment) throw new Error("댓글이 없다잉");
-    res.send({comments: deleteComment, result:"success"});
+    res.send({comments: deleteComment, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(404).json({errorMessage: "에러가 나타났다"});
