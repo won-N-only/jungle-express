@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const commentService = require("../services/commentsService.js");
 const authMiddleware = require("../middlewares/auth.js");
+const postService = require("../services/postService.js");
 
+const PostService = new postService();
 const CommentService = new commentService();
 
 /** 댓글 목록 조회 */
-router.get("/:postId", async (req, res) => {
+router.get("/:postId", idMiddleware, async (req, res) => {
   try {
     const {postId} = req.params;
     const getComment = await CommentService.getComment(postId);
@@ -21,7 +23,7 @@ router.get("/:postId", async (req, res) => {
 });
 
 /** 댓글 작성 */
-router.post("/:postId", authMiddleware, async (req, res) => {
+router.post("/:postId", idMiddleware, authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const {content} = req.body;
 
@@ -31,6 +33,10 @@ router.post("/:postId", authMiddleware, async (req, res) => {
     console.error("입력 안한게있네용");
     return res.status(400).json({errorMessage: "입력 안한게 있네용"});
   }
+
+  const findPost = await PostService.findPost(postId);
+  if (!findPost.length)
+    return res.status(404).json({errorMessage: "터졌다네요"});
 
   try {
     console.log("댓글 작성 시도");
@@ -50,7 +56,7 @@ router.post("/:postId", authMiddleware, async (req, res) => {
 });
 
 /** 댓글 수정 */
-router.patch("/:commentId", authMiddleware, async (req, res) => {
+router.patch("/:commentId", idMiddleware, authMiddleware, async (req, res) => {
   const {commentId} = req.params;
   const {content} = req.body;
   const nickname = res.locals.nickname;
@@ -76,7 +82,7 @@ router.patch("/:commentId", authMiddleware, async (req, res) => {
 });
 
 /** 댓글 삭제 */
-router.delete("/:commentId", authMiddleware, async (req, res) => {
+router.delete("/:commentId", idMiddleware, authMiddleware, async (req, res) => {
   try {
     const nickname = res.locals.nickname;
     const {commentId} = req.params;
