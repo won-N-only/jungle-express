@@ -1,18 +1,17 @@
 const express = require("express");
 const router = express.Router();
-
-const postSchema = require("../schemas/post.js");
+const postService = require("../services/postService.js");
 const authMiddleware = require("../middlewares/auth.js");
+const verify = require("../middlewares/objid.js");
+const PostService = new postService();
 
 /**  전체 게시글 목록 조회 */
 router.get("/", async (req, res) => {
   try {
     console.log("전체 조회 시도 중");
-    const posts = await postSchema
-      .find({}, {title: 1, nickname: 1, date: 1, _id: 1})
-      .sort("-date");
-
+    const posts = await PostService.getPosts();
     console.log("전체 조회 성 공");
+
     res.json({posts: posts, result: "success"});
   } catch (err) {
     console.error(err);
@@ -32,15 +31,11 @@ router.post("/", authMiddleware, async (req, res) => {
 
   try {
     console.log("입력 시도 중");
-    const createPost = await postSchema.create({
-      title: title,
-      nickname: nickname,
-      content: content,
-      date: new Date().toISOString(),
-    });
+    const post = {title, content, nickname, date: new Date().toISOString()};
+    const postPost = await PostService.postPost(post);
     console.log("입력 대성공");
 
-    res.json({posts: createPost, result: "success"}).status(200);
+    res.json({posts: postPost, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "입력 대 실 패 "});
@@ -48,15 +43,16 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 /** 게시글 조회 */
-router.get("/:postId", async (req, res) => {
+router.get("/:postId", verify.post, async (req, res) => {
   try {
     const {postId} = req.params;
     console.log("조회 시도");
-    const post = await postSchema.findById(postId);
-    if (!post) return res.status(400).json({errorMessage: "post 없음"});
+    const findPost = await PostService.findPost(postId);
+    if (!findPost.length)
+      return res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
-    res.json({posts: post, result: "success"}).status(200);
+    res.json({posts: findPost, result: "success"}).status(200);
   } catch (err) {
     console.error(err);
     res.status(502).json({errorMessage: "조 회 대 실 패 "});
@@ -64,23 +60,20 @@ router.get("/:postId", async (req, res) => {
 });
 
 /** 게시글 수정 */
-router.patch("/:postId", authMiddleware, async (req, res) => {
+router.patch("/:postId", verify.post, authMiddleware, async (req, res) => {
   try {
     console.log("수정할 post 조회 시도");
     const {postId} = req.params;
-    const post = await postSchema.findById(postId);
-
+    const {content} = req.body;
     const nickname = res.locals.nickname;
-    if (post.nickname !== nickname)
-      return res.status(400).json({errorMessage: "니가쓴글아니잖아"});
 
     console.log("수정 시도");
-    const {content} = req.body;
-    post.content = content;
+    const findPost = await PostService.updatePost(postId, nickname, content);
+
+    if (!findPost) return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("수정 성공");
 
-    await post.save();
-    res.status(200).json({posts: post, result: "success"});
+    res.status(200).json({posts: findPost, result: "success"});
   } catch (err) {
     console.log(err);
     res.status(500).json({errorMessage: "에러출동~~"});
@@ -88,19 +81,17 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 });
 
 /** 게시글 삭제 */
-router.delete("/:postId", authMiddleware, async (req, res) => {
+router.delete("/:postId", verify.post, authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const nickname = res.locals.nickname;
   try {
     console.log("삭제 시도");
-    const deletedPost = await postSchema.findOneAndDelete({
-      nickname: nickname,
-      _id: postId,
-    });
+
+    const deletedPost = await PostService.deletePost(nickname, postId);
 
     if (!deletedPost) {
       console.log("삭제 실패");
-      return res.status(404).json({errorMessage: "게시글이없다"});
+      return res.status(404).json({errorMessage: "없는데 ??"});
     }
 
     console.log("삭제 성공");

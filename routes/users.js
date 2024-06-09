@@ -3,7 +3,8 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const config = require("../config/index.js");
-const UserSchema = require("../schemas/user.js");
+const userService = require("../services/userService.js");
+const UserService = new userService();
 
 /** 회원가입 */
 function validateNickname(nickname) {
@@ -32,16 +33,13 @@ router.post("/", async (req, res) => {
   if (password !== confirmPassword)
     return res.status(400).json({errorMessage: "비밀번호달라요"});
 
-  const existUser = await UserSchema.findOne({nickname: nickname});
+  const existUser = await UserService.findUser(nickname);
   if (existUser)
     return res.status(400).json({errorMessage: "중복된 닉네임입니당"});
 
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await UserSchema.create({
-      nickname: nickname,
-      password: hashedPassword,
-    });
+    const user = await UserService.createUser(nickname, hashedPassword);
     console.log("가입 성공  ");
 
     res.status(200).json({user, result: "success"});
@@ -57,7 +55,7 @@ router.post("/login", async (req, res) => {
   const {nickname, password} = req.body;
 
   console.log("로그인 시도 중 ");
-  const nicknameCheck = await UserSchema.findOne({nickname: nickname});
+  const nicknameCheck = await UserService.findUser(nickname);
 
   if (!nicknameCheck || !bcrypt.compare(password, nicknameCheck.password))
     return res.status(400).json({errorMessage: "닉네임 패스워드 확인부탁"});
