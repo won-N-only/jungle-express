@@ -21,8 +21,7 @@ module.exports = class mongoosePost {
   }
 
   postPost(post) {
-    const newPost = new PostSchema(post);
-    return newPost.save();
+    return PostSchema.create(post);
   }
 
   findPost(postId) {
