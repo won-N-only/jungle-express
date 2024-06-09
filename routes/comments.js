@@ -1,19 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const commentService = require("../services/commentsService.js");
-const authMiddleware = require("../middlewares/auth.js");
 const postService = require("../services/postService.js");
+const authMiddleware = require("../middlewares/auth.js");
+const idMiddleware = require("../middlewares/objid.js");
 
 const PostService = new postService();
 const CommentService = new commentService();
 
 /** 댓글 목록 조회 */
-router.get("/:postId", idMiddleware, async (req, res) => {
+router.get("/:postId", idMiddleware.postId, async (req, res) => {
   try {
     const {postId} = req.params;
     const getComment = await CommentService.getComment(postId);
-    if (!getComment.length)
-      return res.status(404).json({errorMessage: "에러출동~~"});
     console.log("댓글 조회 성공");
     res.status(200).json({comments: getComment, result: "success"});
   } catch (err) {
@@ -23,7 +22,7 @@ router.get("/:postId", idMiddleware, async (req, res) => {
 });
 
 /** 댓글 작성 */
-router.post("/:postId", idMiddleware, authMiddleware, async (req, res) => {
+router.post("/:postId", idMiddleware.postId, authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const {content} = req.body;
 
@@ -56,7 +55,7 @@ router.post("/:postId", idMiddleware, authMiddleware, async (req, res) => {
 });
 
 /** 댓글 수정 */
-router.patch("/:commentId", idMiddleware, authMiddleware, async (req, res) => {
+router.patch("/:commentId", idMiddleware.commentId, authMiddleware, async (req, res) => {
   const {commentId} = req.params;
   const {content} = req.body;
   const nickname = res.locals.nickname;
@@ -82,7 +81,7 @@ router.patch("/:commentId", idMiddleware, authMiddleware, async (req, res) => {
 });
 
 /** 댓글 삭제 */
-router.delete("/:commentId", idMiddleware, authMiddleware, async (req, res) => {
+router.delete("/:commentId", idMiddleware.commentId, authMiddleware, async (req, res) => {
   try {
     const nickname = res.locals.nickname;
     const {commentId} = req.params;
