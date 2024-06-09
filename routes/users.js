@@ -3,35 +3,22 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const config = require("../config/index.js");
-const userService = require("../services/userService.js");
-const UserService = new userService();
+const UserService = new (require("../services/userService.js"))();
 
 /** 회원가입 */
-function validateNickname(nickname) {
-  if (nickname.length < 3) return "닉은 3글자 이상이어야";
-  if (!/^[A-Za-z0-9][A-Za-z0-9]*$/.test(nickname)) return "닉엔 영어숫자만이요";
-  return null;
-}
-
-function validatePassword(password, nickname, confirmPassword) {
-  if (password.length < 4) return "비밀번호는 4자이상";
-  if (password.includes(nickname)) return "비번안에 닉이 있어요";
-  if (password !== confirmPassword) return "비밀번호달라요";
-  return null;
-}
-
 router.post("/", async (req, res) => {
   const {nickname, password, confirmPassword} = req.body;
 
   console.log("가입 시도  ");
-  const nickErr = validateNickname(nickname);
+  const nickErr = UserService.validateNickname(nickname);
   if (nickErr) return res.status(400).json({errorMessage: nickErr});
 
-  const pwdErr = validatePassword(password, nickname, confirmPassword);
+  const pwdErr = UserService.validatePassword(
+    password,
+    nickname,
+    confirmPassword
+  );
   if (pwdErr) return res.status(400).json({errorMessage: pwdErr});
-
-  if (password !== confirmPassword)
-    return res.status(400).json({errorMessage: "비밀번호달라요"});
 
   const existUser = await UserService.findUser(nickname);
   if (existUser)
