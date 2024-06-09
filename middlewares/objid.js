@@ -8,5 +8,4 @@ const validateObjectId = (req, res, next) => {
   next();
 };
 
-module.exports.posts = validateObjectId;
-module.exports.comments = validateObjectId;
+module.exports = validateObjectId;
