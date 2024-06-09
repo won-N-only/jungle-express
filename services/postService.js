@@ -9,24 +9,24 @@ module.exports = class postService {
     this.commentSchema = CommentSchema;
   }
 
-  async getPosts() {
-    return await this.postSchema.getPosts();
+  getPosts() {
+    return this.postSchema.getPosts();
   }
 
-  async postPost(post) {
-    return await this.postSchema.postPost(post);
+  postPost(post) {
+    return this.postSchema.postPost(post);
   }
 
-  async findPost(postId) {
-    return await this.postSchema.findPost(postId);
+  findPost(postId) {
+    return this.postSchema.findPost(postId);
   }
 
-  async updatePost(postId, nickname, content) {
+  updatePost(postId, nickname, content) {
     return this.postSchema.updatePost(postId, nickname, content);
   }
 
-  async deletePost(nickname, postId) {
-    await this.commentSchema.deleteComments(postId, nickname);
-    return await this.postSchema.deletePost(nickname, postId);
+  deletePost(nickname, postId) {
+    this.commentSchema.deleteComments(postId, nickname);
+    return this.postSchema.deletePost(nickname, postId);
   }
 };
