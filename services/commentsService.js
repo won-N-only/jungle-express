@@ -15,7 +15,7 @@ module.exports = class commentService {
 
   postComment(comment) {
     const post = this.postSchema.findPost(comment.postId);
-    if (!post.length) throw new Error("포스트가없어");
+    if (!post) throw new Error("포스트가없어");
 
     return this.commentSchema.postComment(comment);
   }
