@@ -13,6 +13,8 @@ router.get("/:postId", verify.post, async (req, res) => {
   try {
     const {postId} = req.params;
     const getComment = await CommentService.getComment(postId);
+    if (!getComment)
+      return res.status(404).json({errorMessage: "게시글이없다"});
     console.log("댓글 조회 성공");
     res.status(200).json({comments: getComment, result: "success"});
   } catch (err) {
@@ -85,14 +87,14 @@ router.delete("/:commentId", verify.comm, authMiddleware, async (req, res) => {
   try {
     const nickname = res.locals.nickname;
     const {commentId} = req.params;
-    
+
     const deleteComment = await CommentService.deleteComment(
       commentId,
       nickname
     );
     if (!deleteComment) throw new Error("댓글이 없다잉");
 
-    res.send({comments: deleteComment, result: "success"});
+    res.json({comments: deleteComment, result: "success"});
   } catch (err) {
     console.error(err);
     res.status(404).json({errorMessage: "에러가 나타났다"});

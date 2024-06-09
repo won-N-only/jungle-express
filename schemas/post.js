@@ -15,9 +15,10 @@ const PostSchema = mongoose.model("Post", postSchema);
 
 module.exports = class mongoosePost {
   getPosts() {
-    return PostSchema.find({}, {title: 1, nickname: 1, date: 1, _id: 1}).sort(
-      "-date"
-    );
+    return PostSchema.find(
+      {},
+      {title: 1, nickname: 1, date: 1, content: 1, _id: 1}
+    ).sort("-date");
   }
 
   postPost(post) {
@@ -28,10 +29,10 @@ module.exports = class mongoosePost {
     return PostSchema.find({_id: postId});
   }
 
-  updatePost(postId, nickname, content) {
+  updatePost(postId, nickname,title, content) {
     return PostSchema.findOneAndUpdate(
       {_id: postId, nickname: nickname},
-      {$set: {content: content}},
+      {$set: {content: content,title:title}},
       {new: true}
     );
   }

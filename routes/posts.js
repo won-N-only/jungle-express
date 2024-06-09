@@ -64,13 +64,20 @@ router.patch("/:postId", verify.post, authMiddleware, async (req, res) => {
   try {
     console.log("수정할 post 조회 시도");
     const {postId} = req.params;
-    const {content} = req.body;
+    const {title, content} = req.body;
     const nickname = res.locals.nickname;
 
     console.log("수정 시도");
-    const findPost = await PostService.updatePost(postId, nickname, content);
+    const findPost = await PostService.updatePost(
+      postId,
+      nickname,
+      title,
+      content
+    );
+    const find = await PostService.findPost(postId);
 
-    if (!findPost) return res.status(404).json({errorMessage: "에러출동~~"});
+    if (!findPost)
+      return res.status(404).json({errorMessage: "닉네임이 달라~~!"});
     console.log("수정 성공");
 
     res.status(200).json({posts: findPost, result: "success"});

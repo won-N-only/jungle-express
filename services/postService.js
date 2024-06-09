@@ -21,8 +21,8 @@ module.exports = class postService {
     return this.postSchema.findPost(postId);
   }
 
-  updatePost(postId, nickname, content) {
-    return this.postSchema.updatePost(postId, nickname, content);
+  updatePost(postId, nickname, title, content) {
+    return this.postSchema.updatePost(postId, nickname, title, content);
   }
 
   deletePost(nickname, postId) {
