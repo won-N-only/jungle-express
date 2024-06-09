@@ -85,11 +85,13 @@ router.delete("/:commentId", verify.comm, authMiddleware, async (req, res) => {
   try {
     const nickname = res.locals.nickname;
     const {commentId} = req.params;
+    
     const deleteComment = await CommentService.deleteComment(
       commentId,
       nickname
     );
     if (!deleteComment) throw new Error("댓글이 없다잉");
+
     res.send({comments: deleteComment, result: "success"});
   } catch (err) {
     console.error(err);
