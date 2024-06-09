@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const postService = require("../services/postService.js");
 const authMiddleware = require("../middlewares/auth.js");
-
+const idMiddleware = require("../middlewares/objid.js");
 const PostService = new postService();
 
 /**  전체 게시글 목록 조회 */
@@ -43,12 +43,13 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 /** 게시글 조회 */
-router.get("/:postId", async (req, res) => {
+router.get("/:postId", idMiddleware, async (req, res) => {
   try {
     const {postId} = req.params;
     console.log("조회 시도");
     const findPost = await PostService.findPost(postId);
-    if (!findPost) return res.status(400).json({errorMessage: "post 없음"});
+    if (!findPost.length)
+      return res.status(400).json({errorMessage: "post 없음"});
     console.log("조회 대 성 공");
 
     res.json({posts: findPost, result: "success"}).status(200);
@@ -59,7 +60,7 @@ router.get("/:postId", async (req, res) => {
 });
 
 /** 게시글 수정 */
-router.patch("/:postId", authMiddleware, async (req, res) => {
+router.patch("/:postId", idMiddleware, authMiddleware, async (req, res) => {
   try {
     console.log("수정할 post 조회 시도");
     const {postId} = req.params;
@@ -80,7 +81,7 @@ router.patch("/:postId", authMiddleware, async (req, res) => {
 });
 
 /** 게시글 삭제 */
-router.delete("/:postId", authMiddleware, async (req, res) => {
+router.delete("/:postId", idMiddleware, authMiddleware, async (req, res) => {
   const {postId} = req.params;
   const nickname = res.locals.nickname;
   try {
