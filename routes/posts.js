@@ -74,7 +74,6 @@ router.patch("/:postId", verify.post, authMiddleware, async (req, res) => {
       title,
       content
     );
-    const find = await PostService.findPost(postId);
 
     if (!findPost)
       return res.status(404).json({errorMessage: "닉네임이 달라~~!"});

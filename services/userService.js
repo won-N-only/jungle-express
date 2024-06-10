@@ -37,6 +37,6 @@ module.exports = class userService {
   }
 
   tokenizeNickname(nickname) {
-    return jwt.sign({nickname: nickname}, config.secretKey, {expiresIn: "30m"});
+    return jwt.sign({nickname: nickname}, config.secretKey, {expiresIn: "6h"});
   }
 };
