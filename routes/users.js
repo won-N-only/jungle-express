@@ -47,10 +47,7 @@ router.post("/login", async (req, res) => {
     const token = UserService.tokenizeNickname(nickname);
     console.log("로그인 성공 ");
 
-    res
-      .cookie("authorization", `Bearer ${token}`)
-      .status(200)
-      .json({token, result: "success"});
+    res.status(200).json({result: "success", token: token});
   } catch (err) {
     console.error(err);
     res.status(400).json({errorMessage: "로그인 실패 ㅜㅜ"});
